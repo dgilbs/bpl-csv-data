@@ -8,7 +8,6 @@ CSV.foreach("data/2015_season.csv", headers: true) do |row|
   
 end
 
-Game.all.first.score
 
 binding.pry
 
