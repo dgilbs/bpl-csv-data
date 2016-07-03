@@ -116,11 +116,9 @@ class Game
     hash
   end
 
-  def self.team_matchup(team_one, team_two)
+  def self.team_matchups(team_one, team_two)
     self.all.select{|g| g.teams.include?(team_one) && g.teams.include?(team_two)}
   end
-
-
 
 
 end
