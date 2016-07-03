@@ -5,14 +5,52 @@ require 'json'
 class Game
 
   attr_accessor :date, :home_team, :away_team, :home_goals, :away_goals, :referee
+  attr_accessor :home_halftime_goals, :away_halftime_goals, :result, :half_time_result
+  attr_accessor :home_team_shots, :away_team_shots, :homes_team_sot, :away_team_sot
+  attr_accessor :home_team_post, :away_team_post, :home_team_corners, :away_team_corners
+  attr_accessor :home_team_fouls, :away_team_fouls, :home_team_offsides, :away_team_offsides
+  attr_accessor :home_team_yellows, :away_team_yellows, :home_team_reds, :away_team_reds
 
   @@all = []
+
+#   HHW = Home Team Hit Woodwork
+# AHW = Away Team Hit Woodwork
+# HC = Home Team Corners
+# AC = Away Team Corners
+# HF = Home Team Fouls Committed
+# AF = Away Team Fouls Committed
+# HO = Home Team Offsides
+# AO = Away Team Offsides
+# HY = Home Team Yellow Cards
+# AY = Away Team Yellow Cards
+# HR = Home Team Red Cards
+# AR = Away Team Red Cards
 
   def initialize(hash)
     @home_team = hash["HomeTeam"]
     @away_team = hash["AwayTeam"]
     @home_goals = hash["FTHG"].to_i
     @away_goals = hash["FTAG"].to_i
+    @home_halftime_goals = hash["HTHG"].to_i
+    @away_halftime_goals = hash["HTAG"].to_i
+    @result = hash["FTR"]
+    @half_time_result = hash["HTR"]
+    @home_team_shots = hash["HS"].to_i
+    @away_team_shots = hash["AS"].to_i
+    @homes_team_sot = hash["HST"].to_i
+    @away_team_shots = hash["AST"].to_i
+    @home_team_post = hash["HHW"].to_i
+    @away_team_post = hash["AHW"].to_i
+    @home_team_corners = hash["HC"].to_i
+    @away_team_corners = hash["AC"].to_i
+    @home_team_fouls = hash["HF"].to_i 
+    @away_team_fouls = hash["AF"].to_i
+    @home_team_offsides = hash["HO"].to_i
+    @away_team_offsides = hash["AO"].to_i 
+    @home_team_yellows = hash["HY"].to_i 
+    @away_team_yellows = hash["AY"].to_i
+    @home_team_reds = hash["HR"].to_i
+    @away_team_reds = hash["AR"].to_i
     @referee = hash["Referee"]
     date_elements = hash["Date"].split("/")
     @date = Date.new(date_elements[2].to_i + 2000, date_elements[1].to_i, date_elements[0].to_i)
