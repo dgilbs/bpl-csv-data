@@ -27,6 +27,10 @@ class Game
     self.home_goals == self.away_goals
   end
 
+  def self.all_teams
+    self.all.map{|g| g.home_team}.uniq
+  end
+
   def winner
     if self.home_goals > self.away_goals
       self.home_team
@@ -87,6 +91,33 @@ class Game
     record["losses"] = self.losses_by_team(team)
     record["draws"] = self.draws_by_team(team)
     record
+  end
+
+  def self.team_points(team)
+    total = 0
+    record = self.team_record(team)
+    record.each do |category, count|
+      total += 3 * count if category == "wins"
+      total += 1 * count if category == "draws"
+    end
+    total
+  end
+
+  def self.table
+    hash = {}
+    self.all_teams.each do |team|
+      hash[team] = self.team_points(team)
+    end
+    arr = hash.sort_by{|k, v| v}.reverse
+    hash = {}
+    arr.each do |team|
+      hash[team[0]] = team[1]
+    end
+    hash
+  end
+
+  def self.team_matchup(team_one, team_two)
+    self.all.select{|g| g.teams.include?(team_one) && g.teams.include?(team_two)}
   end
 
 

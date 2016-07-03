@@ -8,6 +8,7 @@ CSV.foreach("data/2015_season.csv", headers: true) do |row|
   
 end
 
+x = Game.team_record("Arsenal")
 
 binding.pry
 
