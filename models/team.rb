@@ -27,6 +27,14 @@ class Team
     Game.all.select{|g| g.teams.include?(self.name)}
   end
 
+  def home_games
+    self.games.select{|g| g.home_team == self.name}
+  end
+
+  def away_games
+    self.games.select{|g| g.away_team == self.name}
+  end
+
   def games_won
     Game.all.select{|g| g.teams.include?(self.name) && g.winner == self.name}
   end
@@ -71,6 +79,18 @@ class Team
 
   def home_wins
     self.games_won.select{|g| g.home_team == self.name}
+  end
+
+  def home_losses
+    self.games_lost.select{|g| g.home_team == self.name}
+  end
+
+  def home_draws
+    self.games_drawn.select{|g| g.home_team == self.name}
+  end
+
+  def home_record
+    record = {"wins": self.home_wins.count, "draws": self.home_draws.count, "losses": self.home_losses.count}
   end
 
 end
