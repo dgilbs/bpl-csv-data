@@ -72,7 +72,7 @@ class Team
     arr = hash.sort_by{|k, v| v}.reverse
     hash = {}
     arr.each do |team|
-      hash[team[0]] = team[1]
+      hash[team[0].name] = team[1]
     end
     hash
   end
@@ -110,7 +110,7 @@ class Team
     arr = hash.sort_by{|k, v| v}.reverse
     hash = {}
     arr.each do |team|
-      hash[team[0]] = team[1]
+      hash[team[0].name] = team[1]
     end
     hash
   end
@@ -119,6 +119,17 @@ class Team
     arr = self.games.map{|g| g.score}
     arr = arr.map{|h| h[self.name]}
     arr.inject(0){|sum, goals| sum + goals}
+  end
+
+  def goals_conceded
+    final = []
+    arr = self.games.map{|g| g.score}
+    arr.each do |score|
+      score.each do |k, v|
+        final.push(v) if k != self.name
+      end
+    end
+    final.inject(0, :+)
   end
 
   def home_goals
@@ -131,8 +142,113 @@ class Team
     arr.inject(0){|sum, goal| sum + goal}
   end
 
-  def self.more_away_goals
+  def self.teams_with_more_away_goals
     self.all.select{|t| t.away_goals > t.home_goals}
+  end
+
+  def away_wins
+    self.games_won.select{|g| g.away_team == self.name}
+  end
+
+  def away_losses
+    self.games_lost.select{|g| g.away_team == self.name}
+  end
+
+  def away_draws
+    self.games_drawn.select{|g| g.away_team == self.name}
+  end
+
+  def away_record
+    {"wins"=> self.away_wins.count, "draws"=> self.away_draws.count, "losses"=> self.away_losses.count}
+  end
+
+  def away_points
+    count = 0
+    self.away_record.each do |k, v|
+      count += 3 * v if k =="wins"
+      count += 1 * v if k == "draws"
+    end
+    count
+  end
+
+  def better_road_team
+    self.away_points > self.home_points
+  end
+
+  def self.better_home_teams
+    self.all.select{|t| !t.better_road_team}
+  end
+
+  def self.better_road_teams
+    self.all.select{|t| t.better_road_team}
+  end
+
+  def self.away_table
+    hash = {}
+    self.all.each do |team|
+      hash[team] = team.away_points
+    end
+    arr = hash.sort_by{|k, v| v}.reverse
+    hash = {}
+    arr.each do |team|
+      hash[team[0].name] = team[1]
+    end
+    hash
+  end
+
+  def place
+    arr = self.class.table.keys
+    arr.index(self.name) + 1
+  end
+
+  def point_progression
+    counter = 0
+    hash = {"Week 0"=> 0}
+    while counter < self.games.length
+      old_string = "Week #{counter}"
+      string = "Week #{counter + 1}"
+      current = hash[old_string]
+      hash[string] = current if self.games[counter].loser == self.name
+      hash[string] = current + 3 if self.games[counter].winner == self.name
+      hash[string] = current + 1 if self.games[counter].draw?
+      counter += 1
+    end
+    hash
+  end
+
+  def self.table_at_week(number)
+    string = "Week #{number}"
+    hash = {}
+    self.all.each do |team|
+      hash[team.name] = team.point_progression[string]
+    end
+    arr = hash.sort_by{|k, v| v}.reverse
+    hash = {}
+    arr.each do |team|
+      hash[team[0]] = team[1]
+    end
+    hash
+  end
+
+  def place_at_week(number)
+    arr = self.class.table_at_week(number).keys
+    arr.index(self.name) + 1
+  end
+
+  def goals_scored_at_week(number)
+    arr = self.games.map{|g| g.score}.map{|h| h[self.name]}.slice(0, number)
+    arr.inject(0, :+)
+  end
+
+  def goals_conceded_at_week(number)
+    arr = self.games.map{|g| g.score}.slice(0, number)
+    final = []
+    arr.each do |score|
+      score.each do |k, v|
+        final << v if k != self.name
+      end
+    end
+    final.inject(0, :+)
   end
 
 
