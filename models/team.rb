@@ -90,7 +90,30 @@ class Team
   end
 
   def home_record
-    record = {"wins": self.home_wins.count, "draws": self.home_draws.count, "losses": self.home_losses.count}
+    record = {"wins"=> self.home_wins.count, "draws"=> self.home_draws.count, "losses"=> self.home_losses.count}
   end
+
+  def home_points
+    count = 0
+    self.home_record.each do |k, v|
+      count += 3 * v if k =="wins"
+      count += 1 * v if k == "draws"
+    end
+    count
+  end
+
+  def self.home_table
+    hash = {}
+    self.all.each do |team|
+      hash[team] = team.home_points
+    end
+    arr = hash.sort_by{|k, v| v}.reverse
+    hash = {}
+    arr.each do |team|
+      hash[team[0]] = team[1]
+    end
+    hash
+  end
+
 
 end
