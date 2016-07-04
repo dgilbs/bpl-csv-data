@@ -14,6 +14,8 @@ x = Team.find("Arsenal")
 y = Team.find("Man City")
 z = Team.find("Aston Villa")
 
+a = x.goals_scored
+
 binding.pry
 
 arr =[]

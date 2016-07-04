@@ -90,7 +90,7 @@ class Team
   end
 
   def home_record
-    record = {"wins"=> self.home_wins.count, "draws"=> self.home_draws.count, "losses"=> self.home_losses.count}
+    {"wins"=> self.home_wins.count, "draws"=> self.home_draws.count, "losses"=> self.home_losses.count}
   end
 
   def home_points
@@ -114,6 +114,27 @@ class Team
     end
     hash
   end
+
+  def goals_scored
+    arr = self.games.map{|g| g.score}
+    arr = arr.map{|h| h[self.name]}
+    arr.inject(0){|sum, goals| sum + goals}
+  end
+
+  def home_goals
+    arr = self.home_games.map{|g| g.home_goals}
+    arr.inject(0){|sum, goal| sum + goal}
+  end
+
+  def away_goals
+    arr = self.away_games.map{|g| g.away_goals}
+    arr.inject(0){|sum, goal| sum + goal}
+  end
+
+  def self.more_away_goals
+    self.all.select{|t| t.away_goals > t.home_goals}
+  end
+
 
 
 end
