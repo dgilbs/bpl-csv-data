@@ -15,7 +15,6 @@ y = Team.find("Man City")
 z = Team.find("Aston Villa")
 
 
-
 a = Team.table_at_week(5)
 
 binding.pry
