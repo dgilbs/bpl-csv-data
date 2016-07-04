@@ -10,7 +10,9 @@ CSV.foreach("data/2015_season.csv", headers: true) do |row|
   
 end
 
-x = Game.team_record("Arsenal")
+x = Team.find("Arsenal")
+y = Team.find("Man City")
+z = Team.find("Aston Villa")
 
 binding.pry
 

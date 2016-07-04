@@ -69,4 +69,8 @@ class Team
     hash
   end
 
+  def home_wins
+    self.games_won.select{|g| g.home_team == self.name}
+  end
+
 end

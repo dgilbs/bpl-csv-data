@@ -154,9 +154,23 @@ class Game
     hash
   end
 
+  def home_win?
+    self.result == "H"
+  end
+
+  def away_win?
+    self.result == "A"
+  end
+
   def self.team_matchups(team_one, team_two)
     self.all.select{|g| g.teams.include?(team_one) && g.teams.include?(team_two)}
   end
+
+  def red_card_win
+    self.winner == self.home_team && self.home_team_reds > 0 || self.winner == self.away_team && self.away_team_reds > 0
+  end
+
+  
 
 
 end
