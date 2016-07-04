@@ -14,7 +14,9 @@ x = Team.find("Arsenal")
 y = Team.find("Man City")
 z = Team.find("Aston Villa")
 
-x.goals_conceded_at_week(5)
+
+
+a = Team.table_at_week(5)
 
 binding.pry
 

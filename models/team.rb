@@ -220,12 +220,15 @@ class Team
     string = "Week #{number}"
     hash = {}
     self.all.each do |team|
-      hash[team.name] = team.point_progression[string]
+      hash[team.name] = {"points"=>team.point_progression[string], "GD" => team.gd_at_week(number)}
     end
-    arr = hash.sort_by{|k, v| v}.reverse
+    arr = hash.sort_by{|k,v| v["points"]}
+    arr.sort! do |a,b|
+      [a[0]["GD"],b[1]["points"]] <=> [b[0]["GD"], a[1]["points"]]
+    end
     hash = {}
     arr.each do |team|
-      hash[team[0]] = team[1]
+      hash[team[0]] = {"points" => team[1]["points"], "GD" => team[1]["GD"]}
     end
     hash
   end
@@ -249,6 +252,10 @@ class Team
       end
     end
     final.inject(0, :+)
+  end
+
+  def gd_at_week(number)
+    self.goals_scored_at_week(number) - self.goals_conceded_at_week(number)
   end
 
 
