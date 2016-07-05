@@ -327,4 +327,19 @@ class Team
     arr.index(self.name) + 1
   end
 
+  def monthly_progression
+    hash ={
+      "September" => self.place_at_date(Date.new(2015, "09".to_i, 01)),
+      "October" => self.place_at_date(Date.new(2015,10,01)),
+      "November" => self.place_at_date(Date.new(2015,11,01)),
+      "December" => self.place_at_date(Date.new(2015,12,01)),
+      "January" => self.place_at_date(Date.new(2016,01,01)),
+      "February" => self.place_at_date(Date.new(2016,02,01)),
+      "March" => self.place_at_date(Date.new(2016,03,01)),
+      "April" => self.place_at_date(Date.new(2016,04,01)),
+      "May" => self.place_at_date(Date.new(2016,05,01)),
+      "June" => self.place
+    }
+  end
+
 end
