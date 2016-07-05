@@ -222,7 +222,7 @@ class Team
     self.all.each do |team|
       hash[team.name] = {"points"=>team.point_progression[string], "GD" => team.gd_at_week(number), "GS" => team.goals_scored_at_week(number)}
     end
-    arr = hash.sort_by{|k,v| [v["points"], v["GD"]]}.reverse
+    arr = hash.sort_by{|k,v| [v["points"], v["GD"], v["GS"]]}.reverse
     hash = {}
     arr.each do |team|
       hash[team[0]] = {"points" => team[1]["points"], "GD" => team[1]["GD"], "GS" => team[1]["GS"]}
@@ -258,13 +258,68 @@ class Team
   def table_progression
     hash = {}
     counter = 1
-    while counter < self.games.length
+    while counter <= self.games.length
       hash[counter] = self.place_at_week(counter)
       counter += 1
     end
     hash
   end
 
+  def games_at_date(date)
+    Game.before_date(date).select{|g| g.teams.include?(self.name)}
+  end
 
+  def wins_at_date(date)
+    self.games_at_date(date).select{|g| self.games_won.include?(g)}
+  end
+
+  def losses_at_date(date)
+    self.games_at_date(date).select{|g| self.games_lost.include?(g)}
+  end
+
+  def draws_at_date(date)
+    self.games_at_date(date).select{|g| self.games_drawn.include?(g)}
+  end
+
+  def record_at_date(date)
+    {"wins" => self.wins_at_date(date).count, "draws"=> self.draws_at_date(date).count, "losses" => self.losses_at_date(date).count}
+  end
+
+  def points_at_date(date)
+    counter = 0
+    self.record_at_date(date).each do |k, v|
+      counter += 3 * v if k =="wins"
+      counter += 1 * v if k == "draws"
+    end
+    counter
+  end
+
+  def goals_scored_at_date(date)
+    arr = self.games_at_date(date).map{|g| g.score[self.name]}
+    arr.inject(0, :+)
+  end
+
+  def goals_conceded_at_date(date)
+    arr = self.games_at_date(date).map{|g| g.goals}
+    total = arr.inject(0, :+)
+    total - self.goals_scored_at_date(date)
+  end
+
+  def gd_at_date(date)
+    self.goals_scored_at_date(date) - self.goals_conceded_at_date(date)
+  end
+
+  def self.table_at_date(date)
+    hash = {}
+    self.all.each do |team|
+      hash[team.name] = {"games" => team.games_at_date(date).count, "points" => team.points_at_date(date), "GD" => team.gd_at_date(date), "GS" => team.goals_scored_at_date(date)}
+    end
+    arr = hash.sort_by{|k, v| [v["points"], v["GD"], v["GS"]]}.reverse
+    hash = {}
+    arr.each do |team|
+      hash[team[0]] = team[1]
+    end
+    hash
+  end
 
 end

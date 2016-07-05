@@ -170,7 +170,15 @@ class Game
     self.winner == self.home_team && self.home_team_reds > 0 || self.winner == self.away_team && self.away_team_reds > 0
   end
 
-  
+  def self.before_date(day)
+    self.all.select{|g| g.date < day}
+  end
+
+  def goals
+    self.home_goals + self.away_goals
+  end
+
+
 
 
 end
