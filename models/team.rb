@@ -312,7 +312,7 @@ class Team
   def self.table_at_date(date)
     hash = {}
     self.all.each do |team|
-      hash[team.name] = {"games" => team.games_at_date(date).count, "points" => team.points_at_date(date), "GD" => team.gd_at_date(date), "GS" => team.goals_scored_at_date(date)}
+      hash[team.name] = {"GP" => team.games_at_date(date).count, "points" => team.points_at_date(date), "GD" => team.gd_at_date(date), "GS" => team.goals_scored_at_date(date)}
     end
     arr = hash.sort_by{|k, v| [v["points"], v["GD"], v["GS"]]}.reverse
     hash = {}
@@ -320,6 +320,11 @@ class Team
       hash[team[0]] = team[1]
     end
     hash
+  end
+
+  def place_at_date(date)
+    arr = self.class.table_at_date(date).keys
+    arr.index(self.name) + 1
   end
 
 end

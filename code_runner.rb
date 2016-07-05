@@ -14,7 +14,7 @@ x = Team.find("Arsenal")
 y = Team.find("Man City")
 z = Team.find("Aston Villa")
 
-date = Date.new(2015,12,30)
+date = Date.new(2015,10,04)
 
 binding.pry
 
