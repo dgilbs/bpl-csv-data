@@ -327,7 +327,7 @@ class Team
     arr.index(self.name) + 1
   end
 
-  def monthly_progression
+  def monthly_table_progression
     hash ={
       "September" => self.place_at_date(Date.new(2015, "09".to_i, 01)),
       "October" => self.place_at_date(Date.new(2015,10,01)),
@@ -340,6 +340,33 @@ class Team
       "May" => self.place_at_date(Date.new(2016,05,01)),
       "June" => self.place
     }
+  end
+
+  def monthly_point_progression
+    hash = {
+      "September" => self.points_at_date(Date.new(2015, "09".to_i, 01)),
+      "October" => self.points_at_date(Date.new(2015,10,01)),
+      "November" => self.points_at_date(Date.new(2015,11,01)),
+      "December" => self.points_at_date(Date.new(2015,12,01)),
+      "January" => self.points_at_date(Date.new(2016,01,01)),
+      "February" => self.points_at_date(Date.new(2016,02,01)),
+      "March" => self.points_at_date(Date.new(2016,03,01)),
+      "April" => self.points_at_date(Date.new(2016,04,01)),
+      "May" => self.points_at_date(Date.new(2016,05,01)),
+      "June" => self.points
+    }
+  end
+
+  def winning_at_halftime
+    self.games.select{|g| g.halftime_leader == self.name}
+  end
+
+  def losing_at_halftime
+    self.games.select{|g| g.halftime_leader != self.name && g.half_time_result != "D"}
+  end
+
+  def tied_at_halftime
+    self.games.select{|g| g.half_time_result == "D"}
   end
 
 end

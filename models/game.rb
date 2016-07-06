@@ -178,6 +178,34 @@ class Game
     self.home_goals + self.away_goals
   end
 
+  def halftime_score
+    {self.home_team => self.home_halftime_goals, self.away_team => self.away_halftime_goals}
+  end
+
+  def halftime_leader
+    return self.away_team if self.half_time_result == "A"
+    return self.home_team if self.half_time_result == "H"
+    return nil if self.half_time_result == "D"
+  end
+
+  def comeback?
+    return true if self.half_time_result == "H" && self.result == "A"
+    return true if self.half_time_result == "A" && self.result == "H"
+    return false
+  end
+
+  def self.comebacks
+    self.all.select{|g| g.comeback?}
+  end
+
+  def halftime_tie_broken
+    self.half_time_result == "D" && self.result != "D"
+  end
+
+  def self.halftime_ties_broken
+    self.all.select{|g| g.halftime_tie_broken}
+  end
+
 
 
 
