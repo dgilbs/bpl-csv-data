@@ -369,4 +369,77 @@ class Team
     self.games.select{|g| g.half_time_result == "D"}
   end
 
+  def winning_at_halftime_record
+    {"wins" => self.games_won.select{|g| self.winning_at_halftime.include?(g)}.count,
+     "draws" => self.games_drawn.select{|g| self.winning_at_halftime.include?(g)}.count,
+     "losses" =>self.games_lost.select{|g| self.winning_at_halftime.include?(g)}.count
+  }
+  end
+
+  def losing_at_halftime_record
+    {"wins" => self.games_won.select{|g| self.losing_at_halftime.include?(g)}.count,
+     "draws" => self.games_drawn.select{|g| self.losing_at_halftime.include?(g)}.count,
+     "losses" =>self.games_lost.select{|g| self.losing_at_halftime.include?(g)}.count
+  }
+  end
+
+  def tied_at_halftime_record
+    {"wins" => self.games_won.select{|g| self.tied_at_halftime.include?(g)}.count,
+     "draws" => self.games_drawn.select{|g| self.tied_at_halftime.include?(g)}.count,
+     "losses" =>self.games_lost.select{|g| self.tied_at_halftime.include?(g)}.count
+  }
+  end
+
+  def points_from_record(record)
+    count = 0
+    record.each do |k, v|
+      count += v * 3 if k == "wins"
+      count += v if k == "draws"
+    end
+    count
+  end
+
+  def points_dropped_from_record(record)
+    count = 0
+    record.each do |k, v|
+      count += 3 * v if k == "losses"
+      count += 2* v if k =="draws"
+    end
+    count
+  end
+
+  def self.losing_at_halftime_wins
+    hash ={}
+    self.all.each do |team|
+      hash[team.name] = team.losing_at_halftime_record["wins"]
+    end
+    hash
+  end
+
+  def self.losing_at_halftime_table
+    hash ={}
+    self.all.each do |team|
+      hash[team.name] = team.points_from_record(team.losing_at_halftime_record)
+    end
+    arr = hash.sort_by{|k, v| v}.reverse
+    hash = {}
+    arr.each do |team|
+      hash[team[0]] = team[1]
+    end
+    hash
+  end
+
+  def self.points_dropped_after_halftime_lead_table
+    hash = {}
+    self.all.each do |team|
+      hash[team.name] = team.points_dropped_from_record(team.winning_at_halftime_record)   
+    end
+    arr = hash.sort_by{|k, v| v}.reverse
+    hash = {}
+    arr.each do |team|
+      hash[team[0]] = team[1]
+    end
+    hash
+  end
+
 end
