@@ -16,6 +16,8 @@ z = Team.find("Aston Villa")
 
 date = Date.new(2015,10,04)
 
+t = Team.shutout_table
+
 binding.pry
 
 arr =[]

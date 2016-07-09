@@ -55,11 +55,20 @@ class Team
     hash
   end
 
-  def points 
+  def points_from_record(record)
     count = 0
-    self.record.each do |k, v|
-      count += 3 * v if k =="wins"
-      count += 1 * v if k == "draws"
+    record.each do |k, v|
+      count += v * 3 if k == "wins"
+      count += v if k == "draws"
+    end
+    count
+  end
+
+  def points_dropped_from_record(record)
+    count = 0
+    record.each do |k, v|
+      count += 3 * v if k == "losses"
+      count += 2* v if k =="draws"
     end
     count
   end
@@ -67,7 +76,7 @@ class Team
   def self.table
     hash = {}
     self.all.each do |team|
-      hash[team] = team.points
+      hash[team] = team.points_from_record(team.record)
     end
     arr = hash.sort_by{|k, v| v}.reverse
     hash = {}
@@ -105,7 +114,7 @@ class Team
   def self.home_table
     hash = {}
     self.all.each do |team|
-      hash[team] = team.home_points
+      hash[team] = team.points_from_record()
     end
     arr = hash.sort_by{|k, v| v}.reverse
     hash = {}
@@ -390,23 +399,7 @@ class Team
   }
   end
 
-  def points_from_record(record)
-    count = 0
-    record.each do |k, v|
-      count += v * 3 if k == "wins"
-      count += v if k == "draws"
-    end
-    count
-  end
 
-  def points_dropped_from_record(record)
-    count = 0
-    record.each do |k, v|
-      count += 3 * v if k == "losses"
-      count += 2* v if k =="draws"
-    end
-    count
-  end
 
   def self.losing_at_halftime_wins
     hash ={}
@@ -440,6 +433,35 @@ class Team
       hash[team[0]] = team[1]
     end
     hash
+  end
+
+  def shutouts
+    self.games.select{|g| !self.games_lost.include?(g) && g.shutout}
+  end
+
+  def self.shutout_table
+    hash = {}
+    self.all.each do |team|
+      hash[team.name] = team.shutouts.count
+    end
+    arr = hash.sort_by{|k, v| v}.reverse
+    hash = {}
+    arr.each do |team|
+      hash[team[0]] = team[1]
+    end
+    hash
+  end
+
+  def man_down_at_home
+    self.games.select do |game|
+      game.home_team == self.name && game.home_team_reds > 0      
+    end
+  end
+
+  def man_down_away
+    self.games.select do |game|
+      game.away_team == self.name && game.away_team_reds > 0 
+    end
   end
 
 end

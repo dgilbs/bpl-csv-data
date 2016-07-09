@@ -206,6 +206,10 @@ class Game
     self.all.select{|g| g.halftime_tie_broken}
   end
 
+  def shutout
+    self.home_goals == 0 || self.away_goals ==0
+  end
+
 
 
 
