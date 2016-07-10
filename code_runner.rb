@@ -16,7 +16,7 @@ z = Team.find("Aston Villa")
 
 date = Date.new(2015,10,04)
 
-t = Team.shutout_table
+t = Team.shot_conversion_table
 
 binding.pry
 

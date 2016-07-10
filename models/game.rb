@@ -6,7 +6,7 @@ class Game
 
   attr_accessor :date, :home_team, :away_team, :home_goals, :away_goals, :referee
   attr_accessor :home_halftime_goals, :away_halftime_goals, :result, :half_time_result
-  attr_accessor :home_team_shots, :away_team_shots, :homes_team_sot, :away_team_sot
+  attr_accessor :home_team_shots, :away_team_shots, :home_team_sot, :away_team_sot
   attr_accessor :home_team_post, :away_team_post, :home_team_corners, :away_team_corners
   attr_accessor :home_team_fouls, :away_team_fouls, :home_team_offsides, :away_team_offsides
   attr_accessor :home_team_yellows, :away_team_yellows, :home_team_reds, :away_team_reds
@@ -37,8 +37,8 @@ class Game
     @half_time_result = hash["HTR"]
     @home_team_shots = hash["HS"].to_i
     @away_team_shots = hash["AS"].to_i
-    @homes_team_sot = hash["HST"].to_i
-    @away_team_shots = hash["AST"].to_i
+    @home_team_sot = hash["HST"].to_i
+    @away_team_sot = hash["AST"].to_i
     @home_team_post = hash["HHW"].to_i
     @away_team_post = hash["AHW"].to_i
     @home_team_corners = hash["HC"].to_i
@@ -208,6 +208,14 @@ class Game
 
   def shutout
     self.home_goals == 0 || self.away_goals ==0
+  end
+
+  def shot_count
+    {self.home_team => self.home_team_shots, self.away_team => self.away_team_shots}
+  end
+
+  def sot_count
+    {self.home_team => self.home_team_sot, self.away_team => self.away_team_sot}
   end
 
 

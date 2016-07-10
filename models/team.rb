@@ -86,6 +86,15 @@ class Team
     hash
   end
 
+  def self.table_sorter(hash)
+    arr = hash.sort_by{|k, v| v}.reverse
+    hash = {}
+    arr.each do |team|
+      hash[team[0]] = team[1]
+    end
+    hash
+  end
+
   def home_wins
     self.games_won.select{|g| g.home_team == self.name}
   end
@@ -114,10 +123,11 @@ class Team
   def self.home_table
     hash = {}
     self.all.each do |team|
-      hash[team] = team.points_from_record()
+      hash[team] = team.points_from_record(team.home_record)
     end
     arr = hash.sort_by{|k, v| v}.reverse
     hash = {}
+    binding.pry
     arr.each do |team|
       hash[team[0].name] = team[1]
     end
@@ -427,12 +437,7 @@ class Team
     self.all.each do |team|
       hash[team.name] = team.points_dropped_from_record(team.winning_at_halftime_record)   
     end
-    arr = hash.sort_by{|k, v| v}.reverse
-    hash = {}
-    arr.each do |team|
-      hash[team[0]] = team[1]
-    end
-    hash
+    self.table_sorter(hash)
   end
 
   def shutouts
@@ -444,12 +449,7 @@ class Team
     self.all.each do |team|
       hash[team.name] = team.shutouts.count
     end
-    arr = hash.sort_by{|k, v| v}.reverse
-    hash = {}
-    arr.each do |team|
-      hash[team[0]] = team[1]
-    end
-    hash
+    self.table_sorter(hash)
   end
 
   def man_down_at_home
@@ -462,6 +462,25 @@ class Team
     self.games.select do |game|
       game.away_team == self.name && game.away_team_reds > 0 
     end
+  end
+
+  def shots
+    arr = self.games.map{|g| g.shot_count[self.name]}
+    arr.inject(0, :+)
+  end
+
+  def shots_on_target
+    arr = self.games.map{|g| g.sot_count[self.name]}
+    arr.inject(0, :+)
+  end
+
+  def self.shot_conversion_table
+    hash = {}
+    self.all.each do |team|
+      count = team.goals_scored.to_f/team.shots.to_f
+      hash[team.name] = count.round(4)
+    end
+    self.table_sorter(hash)
   end
 
 end
