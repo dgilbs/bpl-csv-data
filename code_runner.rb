@@ -16,7 +16,7 @@ z = Team.find("Aston Villa")
 
 date = Date.new(2015,10,04)
 
-t = Team.shot_conversion_table
+t = Team.more_shots_and_lost_count
 
 binding.pry
 

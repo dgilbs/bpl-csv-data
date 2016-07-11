@@ -239,7 +239,8 @@ class Team
     string = "Week #{number}"
     hash = {}
     self.all.each do |team|
-      hash[team.name] = {"points"=>team.point_progression[string], "GD" => team.gd_at_week(number), "GS" => team.goals_scored_at_week(number)}
+      hash[team.name] = {"points"=>team.point_progression[string], 
+        "GD" => team.gd_at_week(number), "GS" => team.goals_scored_at_week(number)}
     end
     arr = hash.sort_by{|k,v| [v["points"], v["GD"], v["GS"]]}.reverse
     hash = {}
@@ -331,7 +332,8 @@ class Team
   def self.table_at_date(date)
     hash = {}
     self.all.each do |team|
-      hash[team.name] = {"GP" => team.games_at_date(date).count, "points" => team.points_at_date(date), "GD" => team.gd_at_date(date), "GS" => team.goals_scored_at_date(date)}
+      hash[team.name] = {"GP" => team.games_at_date(date).count, "points" => team.points_at_date(date), 
+        "GD" => team.gd_at_date(date), "GS" => team.goals_scored_at_date(date)}
     end
     arr = hash.sort_by{|k, v| [v["points"], v["GD"], v["GS"]]}.reverse
     hash = {}
@@ -372,7 +374,7 @@ class Team
       "March" => self.points_at_date(Date.new(2016,03,01)),
       "April" => self.points_at_date(Date.new(2016,04,01)),
       "May" => self.points_at_date(Date.new(2016,05,01)),
-      "June" => self.points
+      "June" => self.points_from_record(self.record)
     }
   end
 
@@ -452,18 +454,6 @@ class Team
     self.table_sorter(hash)
   end
 
-  def man_down_at_home
-    self.games.select do |game|
-      game.home_team == self.name && game.home_team_reds > 0      
-    end
-  end
-
-  def man_down_away
-    self.games.select do |game|
-      game.away_team == self.name && game.away_team_reds > 0 
-    end
-  end
-
   def shots
     arr = self.games.map{|g| g.shot_count[self.name]}
     arr.inject(0, :+)
@@ -481,6 +471,77 @@ class Team
       hash[team.name] = count.round(4)
     end
     self.table_sorter(hash)
+  end
+
+  def self.sot_conversion_table
+    hash = {}
+    self.all.each do |team|
+      count = team.goals_scored.to_f/team.shots_on_target.to_f
+      hash[team.name] = count.round(4)
+    end
+    self.table_sorter(hash)
+  end
+
+  def self.sot_to_shots_table
+    hash = {}
+    self.all.each do |team|
+      count = team.shots_on_target.to_f/team.shots.to_f
+      hash[team.name] = count.round(4)
+    end
+    self.table_sorter(hash)
+  end
+
+  def self.more_shots_and_lost_count
+    hash ={}
+    self.all.each do |team|
+      hash[team.name] = team.games_lost.select{|g| g.more_shots_and_lost}.count
+    end
+    self.table_sorter(hash)
+  end
+
+  def self.fewer_shots_and_won_count
+    hash = {}
+    self.all.each do |team|
+      hash[team.name] = team.games_won.select{|g| g.more_shots_and_lost}.count
+    end
+    self.table_sorter(hash)
+  end
+
+  def games_with_red_cards
+    self.games.select{|g| g.red_cards[self.name] > 0}
+  end
+
+  def red_card_record
+    {"wins" => self.games_won.select{|g| games_with_red_cards.include?(g)}.count,
+    "draws" => self.games_drawn.select{|g| games_with_red_cards.include?(g)}.count,
+    "losses" => self.games_lost.select{|g| games_with_red_cards.include?(g)}.count
+  }
+  end
+
+  def self.red_card_points_table
+    hash = {}
+    self.all.each do |team|
+      hash[team.name] = team.points_from_record(team.red_card_record)
+    end
+    self.table_sorter(hash)
+  end
+
+  def first_half_goals
+    arr = self.games.map{|g| g.halftime_score[self.name]}
+    arr.inject(0, :+)
+  end
+
+  def second_half_goals
+    arr = self.games.map{|g| g.second_half_score[self.name]}
+    arr.inject(0, :+)
+  end
+
+  def self.more_first_half_goals
+    self.all.select{|t| t.first_half_goals > t.second_half_goals}
+  end
+
+  def self.more_second_half_goals
+    self.all.select{|t| t.second_half_goals > t.first_half_goals}
   end
 
 end

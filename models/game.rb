@@ -11,20 +11,9 @@ class Game
   attr_accessor :home_team_fouls, :away_team_fouls, :home_team_offsides, :away_team_offsides
   attr_accessor :home_team_yellows, :away_team_yellows, :home_team_reds, :away_team_reds
 
-  @@all = []
+  attr_accessor :score
 
-#   HHW = Home Team Hit Woodwork
-# AHW = Away Team Hit Woodwork
-# HC = Home Team Corners
-# AC = Away Team Corners
-# HF = Home Team Fouls Committed
-# AF = Away Team Fouls Committed
-# HO = Home Team Offsides
-# AO = Away Team Offsides
-# HY = Home Team Yellow Cards
-# AY = Away Team Yellow Cards
-# HR = Home Team Red Cards
-# AR = Away Team Red Cards
+  @@all = []
 
   def initialize(hash)
     @home_team = hash["HomeTeam"]
@@ -182,6 +171,12 @@ class Game
     {self.home_team => self.home_halftime_goals, self.away_team => self.away_halftime_goals}
   end
 
+  def second_half_score
+    {self.home_team => (self.score[self.home_team] - self.halftime_score[self.home_team]),
+      self.away_team => (self.score[self.away_team] - self.halftime_score[self.away_team])
+    }
+  end
+
   def halftime_leader
     return self.away_team if self.half_time_result == "A"
     return self.home_team if self.half_time_result == "H"
@@ -218,6 +213,27 @@ class Game
     {self.home_team => self.home_team_sot, self.away_team => self.away_team_sot}
   end
 
+  def more_shots
+    return self.away_team if self.away_team_shots > self.home_team_shots
+    return self.home_team if self.home_team_shots > self.away_team_shots
+    return "tie"
+  end
+
+  def more_shots_and_lost
+    self.more_shots == self.loser
+  end
+
+  def red_cards
+    {self.home_team => self.home_team_reds, self.away_team => self.away_team_reds}
+  end
+
+  def both_teams_red_carded
+    self.red_cards[self.home_team] > 0 && self.red_cards[self.away_team] > 0
+  end
+
+  def total_red_cards
+    self.red_cards[self.home_team] + self.red_cards[self.away_team]
+  end
 
 
 
