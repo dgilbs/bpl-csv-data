@@ -16,7 +16,9 @@ z = Team.find("Aston Villa")
 
 date = Date.new(2015,10,04)
 
-t = Team.more_shots_and_lost_count
+g = Game.all[155]
+
+t = x.most_sots_without_a_goal
 
 binding.pry
 

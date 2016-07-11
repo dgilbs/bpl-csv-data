@@ -3,43 +3,36 @@ require 'json'
 
 
 class Game
-
-  attr_accessor :date, :home_team, :away_team, :home_goals, :away_goals, :referee
-  attr_accessor :home_halftime_goals, :away_halftime_goals, :result, :half_time_result
-  attr_accessor :home_team_shots, :away_team_shots, :home_team_sot, :away_team_sot
-  attr_accessor :home_team_post, :away_team_post, :home_team_corners, :away_team_corners
-  attr_accessor :home_team_fouls, :away_team_fouls, :home_team_offsides, :away_team_offsides
-  attr_accessor :home_team_yellows, :away_team_yellows, :home_team_reds, :away_team_reds
-
-  attr_accessor :score
+  attr_accessor :home_team, :away_team,:score, :halftime_score, :shot_count, :sot_count, :post_count
+  attr_accessor :corners, :fouls, :offsides, :red_cards, :yellow_cards, :half_time_result, :result, :date, :referee
 
   @@all = []
 
   def initialize(hash)
     @home_team = hash["HomeTeam"]
     @away_team = hash["AwayTeam"]
-    @home_goals = hash["FTHG"].to_i
-    @away_goals = hash["FTAG"].to_i
-    @home_halftime_goals = hash["HTHG"].to_i
-    @away_halftime_goals = hash["HTAG"].to_i
+    @score = {self.home_team => hash["FTHG"].to_i,
+      self.away_team => hash["FTAG"].to_i}
+    @halftime_score = {self.home_team => hash["HTHG"].to_i, 
+      self.away_team => hash["HTAG"].to_i}
     @result = hash["FTR"]
     @half_time_result = hash["HTR"]
-    @home_team_shots = hash["HS"].to_i
-    @away_team_shots = hash["AS"].to_i
-    @home_team_sot = hash["HST"].to_i
-    @away_team_sot = hash["AST"].to_i
-    @home_team_post = hash["HHW"].to_i
-    @away_team_post = hash["AHW"].to_i
-    @home_team_corners = hash["HC"].to_i
-    @away_team_corners = hash["AC"].to_i
-    @home_team_fouls = hash["HF"].to_i 
-    @away_team_fouls = hash["AF"].to_i
-    @home_team_offsides = hash["HO"].to_i
-    @away_team_offsides = hash["AO"].to_i 
-    @home_team_yellows = hash["HY"].to_i 
-    @away_team_yellows = hash["AY"].to_i
-    @home_team_reds = hash["HR"].to_i
-    @away_team_reds = hash["AR"].to_i
+    @shot_count = {self.home_team => hash["HS"].to_i,
+      self.away_team => hash["AS"].to_i}
+    @sot_count = {self.home_team => hash["HST"].to_i,
+      self.away_team => hash["AST"].to_i}
+    @post_count = {self.home_team => hash["HHW"].to_i,
+      self.away_team => hash["AHW"].to_i}
+    @corners = {self.home_team => hash["HC"].to_i,
+      self.away_team => hash["AC"].to_i}
+    @fouls = {self.home_team => hash["HF"].to_i ,
+      self.away_team => hash["AF"].to_i}
+    @offsides = {self.home_team => hash["HO"].to_i,
+      self.away_team => hash["AO"].to_i}
+    @yellow_cards =  {self.home_team => hash["HY"].to_i,
+      self.away_team => hash["AY"].to_i}
+    @red_cards = {self.home_team => hash["HR"].to_i,
+      self.away_team => hash["AR"].to_i}
     @referee = hash["Referee"]
     date_elements = hash["Date"].split("/")
     @date = Date.new(date_elements[2].to_i + 2000, date_elements[1].to_i, date_elements[0].to_i)
@@ -51,17 +44,13 @@ class Game
   end
 
   def draw?
-    self.home_goals == self.away_goals
-  end
-
-  def self.all_teams
-    self.all.map{|g| g.home_team}.uniq
+    self.score[self.away_team] == self.score[self.home_team]
   end
 
   def winner
-    if self.home_goals > self.away_goals
+    if self.score[self.home_team] > self.score[self.away_team]
       self.home_team
-    elsif self.away_goals > self.home_goals
+    elsif self.score[self.away_team] > self.score[self.home_team]
       self.away_team
     else
       nil
@@ -69,78 +58,29 @@ class Game
   end
 
   def loser
-    if self.home_goals < self.away_goals
+    if self.score[self.home_team] < self.score[self.away_team]
       self.home_team
-    elsif self.away_goals < self.home_goals
+    elsif self.score[self.away_team] < self.score[self.home_team]
       self.away_team
     else
       nil
     end  
   end
 
-
-  def teams
-    arr = []
-    arr.push(self.home_team)
-    arr.push(self.away_team)
-    arr
+  def goal_difference
+    if self.winner
+      self.score[self.winner] - self.score[self.loser]
+    else
+      0
+    end
   end
 
-  def score
-    score_hash = {}
-    score_hash[self.home_team] = self.home_goals
-    score_hash[self.away_team] = self.away_goals
-    score_hash
+  def teams
+    [self.home_team, self.away_team]
   end
 
   def self.games_by_team(team)
     games = self.all.select{|game| game.teams.include?(team)}
-  end
-
-  def self.wins_by_team(team)
-    games = self.games_by_team(team)
-    games.select{|g| g.winner == team}.length
-  end
-
-  def self.losses_by_team(team)
-    games = self.games_by_team(team)
-    games.select{|g| g.loser == team}.length
-  end
-
-  def self.draws_by_team(team)
-    games = self.games_by_team(team)
-    games.select{|g| g.draw?}.length
-  end
-
-  def self.team_record(team)
-    record = {}
-    record["wins"] = self.wins_by_team(team)
-    record["losses"] = self.losses_by_team(team)
-    record["draws"] = self.draws_by_team(team)
-    record
-  end
-
-  def self.team_points(team)
-    total = 0
-    record = self.team_record(team)
-    record.each do |category, count|
-      total += 3 * count if category == "wins"
-      total += 1 * count if category == "draws"
-    end
-    total
-  end
-
-  def self.table
-    hash = {}
-    self.all_teams.each do |team|
-      hash[team] = self.team_points(team)
-    end
-    arr = hash.sort_by{|k, v| v}.reverse
-    hash = {}
-    arr.each do |team|
-      hash[team[0]] = team[1]
-    end
-    hash
   end
 
   def home_win?
@@ -156,7 +96,7 @@ class Game
   end
 
   def red_card_win
-    self.winner == self.home_team && self.home_team_reds > 0 || self.winner == self.away_team && self.away_team_reds > 0
+    self.red_cards[self.winner] > 0
   end
 
   def self.before_date(day)
@@ -164,11 +104,7 @@ class Game
   end
 
   def goals
-    self.home_goals + self.away_goals
-  end
-
-  def halftime_score
-    {self.home_team => self.home_halftime_goals, self.away_team => self.away_halftime_goals}
+    self.score[self.home_team] + self.score[self.away_team]
   end
 
   def second_half_score
@@ -202,29 +138,17 @@ class Game
   end
 
   def shutout
-    self.home_goals == 0 || self.away_goals ==0
-  end
-
-  def shot_count
-    {self.home_team => self.home_team_shots, self.away_team => self.away_team_shots}
-  end
-
-  def sot_count
-    {self.home_team => self.home_team_sot, self.away_team => self.away_team_sot}
+    self.score[self.home_team]== 0 || self.score[self.away_team] ==0
   end
 
   def more_shots
-    return self.away_team if self.away_team_shots > self.home_team_shots
-    return self.home_team if self.home_team_shots > self.away_team_shots
+    return self.away_team if self.shot_count[self.away_team] > self.shot_count[self.home_team]
+    return self.home_team if self.shot_count[self.home_team] > self.shot_count[self.away_team]
     return "tie"
   end
 
   def more_shots_and_lost
     self.more_shots == self.loser
-  end
-
-  def red_cards
-    {self.home_team => self.home_team_reds, self.away_team => self.away_team_reds}
   end
 
   def both_teams_red_carded
@@ -233,6 +157,18 @@ class Game
 
   def total_red_cards
     self.red_cards[self.home_team] + self.red_cards[self.away_team]
+  end
+
+  def sot_percentage_per_team
+    home_count= (self.sot_count[self.home_team].to_f/self.shot_count[self.home_team].to_f).round(4)
+    away_count = (self.sot_count[self.away_team].to_f/self.shot_count[self.away_team].to_f).round(4)
+    {self.home_team => home_count, self.away_team => away_count}
+  end
+
+  def shot_conversion_per_team
+    home_count = (self.score[self.home_team].to_f/self.shot_count[self.home_team].to_f).round(4)
+    away_count = (self.score[self.away_team].to_f/self.shot_count[self.away_team].to_f).round(4)
+    {self.home_team => home_count, self.away_team => away_count}
   end
 
 

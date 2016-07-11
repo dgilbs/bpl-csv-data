@@ -48,11 +48,9 @@ class Team
   end
 
   def record
-    hash ={}
-    hash["wins"] = self.games_won.length
-    hash["draws"] = self.games_drawn.length
-    hash["losses"] = self.games_lost.length
-    hash
+    {"wins" => self.games_won.length,
+     "draws" => self.games_drawn.length,
+     "losses" => self.games_lost.length}
   end
 
   def points_from_record(record)
@@ -127,7 +125,6 @@ class Team
     end
     arr = hash.sort_by{|k, v| v}.reverse
     hash = {}
-    binding.pry
     arr.each do |team|
       hash[team[0].name] = team[1]
     end
@@ -152,12 +149,12 @@ class Team
   end
 
   def home_goals
-    arr = self.home_games.map{|g| g.home_goals}
+    arr = self.home_games.map{|g| g.score[self.name]}
     arr.inject(0){|sum, goal| sum + goal}
   end
 
   def away_goals
-    arr = self.away_games.map{|g| g.away_goals}
+    arr = self.away_games.map{|g| g.score[self.name]}
     arr.inject(0){|sum, goal| sum + goal}
   end
 
@@ -418,7 +415,7 @@ class Team
     self.all.each do |team|
       hash[team.name] = team.losing_at_halftime_record["wins"]
     end
-    hash
+    self.table_sorter(hash)
   end
 
   def self.losing_at_halftime_table
@@ -543,5 +540,33 @@ class Team
   def self.more_second_half_goals
     self.all.select{|t| t.second_half_goals > t.first_half_goals}
   end
+
+  def sot_percentage_per_game
+    arr = self.games.map{|g| g.sot_percentage_per_team[self.name]}
+    hash = {}
+    counter = 0
+    while counter < self.games.length
+      string = "Game #{counter + 1}"
+      hash[string] = arr[counter]
+      counter += 1
+    end
+    hash
+  end
+
+  def most_sots_without_a_goal
+    arr = self.games.select{|g| g.score[self.name] == 0}
+    shots = arr.map{|g| g.sot_count[self.name]}
+    shots.sort.last
+  end
+
+  def self.most_sots_without_a_goal
+    hash = {}
+    self.all.each do | team|
+      hash[team.name] = team.most_sots_without_a_goal
+    end
+    self.table_sorter(hash)
+  end
+
+
 
 end
