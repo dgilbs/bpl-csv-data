@@ -567,6 +567,26 @@ class Team
     self.table_sorter(hash)
   end
 
+  def refs
+    arr = self.games.map{|g| g.referee}
+    arr.uniq
+  end
+
+  def record_with_ref(ref)
+    {"wins" => self.games_won.select{|g| g.referee == ref}.count, 
+    "draws" => self.games_drawn.select{|g| g.referee == ref}.count,
+    "losses" => self.games_lost.select{|g| g.referee == ref}.count
+  }
+  end
+
+  def points_per_ref
+    hash = {}
+    self.refs.each do |ref|
+      hash[ref] = self.points_from_record(record_with_ref(ref))
+    end
+    self.class.table_sorter(hash)
+  end
+
 
 
 end

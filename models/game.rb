@@ -79,6 +79,10 @@ class Game
     [self.home_team, self.away_team]
   end
 
+  def refs
+    @refs
+  end
+
   def self.games_by_team(team)
     games = self.all.select{|game| game.teams.include?(team)}
   end
@@ -96,7 +100,7 @@ class Game
   end
 
   def red_card_win
-    self.red_cards[self.winner] > 0
+    self.red_cards[self.winner] > 0 if self.winner
   end
 
   def self.before_date(day)
