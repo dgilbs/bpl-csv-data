@@ -175,6 +175,10 @@ class Game
     {self.home_team => home_count, self.away_team => away_count}
   end
 
+  def total_fouls
+    self.fouls.values.inject(0, :+)
+  end
+
 
 
 end
