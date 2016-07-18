@@ -84,4 +84,13 @@ class Referee
     self.class.table_sorter(hash)
   end
 
+  def table
+    hash = {}
+    self.teams.each do |team|
+      t = Team.find(team)
+      hash[team] = t.points_from_record(t.record_with_ref(self.name))
+    end
+    self.class.table_sorter(hash)
+  end
+
 end

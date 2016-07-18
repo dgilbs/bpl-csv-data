@@ -587,6 +587,26 @@ class Team
     self.class.table_sorter(hash)
   end
 
+  def games_against(team)
+    self.games.select{|g| g.teams.include?(team.name)}
+  end
+
+  def record_against(string)
+    {"wins" => self.games_won.select{|g| self.games_against(team).include?(g)}.count, 
+      "draws" =>self.games_drawn.select{|g| self.games_against(team).include?(g)}.count,
+      "losses" => self.games_lost.select{|g| self.games_against(team).include?(g)}.count
+    }
+  end
+
+  def season_sweep
+    self.class.all.select{|t| self.points_from_record(self.record_against(t))==6}
+  end
+
+  def lost_both
+    self.class.all.select{|t| self.points_from_record(self.record_against(t))==0}
+  end
+
+
 
 
 end

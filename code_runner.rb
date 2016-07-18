@@ -19,6 +19,8 @@ date = Date.new(2015,10,04)
 
 g = Game.all[155]
 
+a = x.games_against(y)
+
 t = x.most_sots_without_a_goal
 
 r = Referee.all.first
