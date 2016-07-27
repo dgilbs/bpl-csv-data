@@ -606,6 +606,10 @@ class Team
     self.class.all.select{|t| self.points_from_record(self.record_against(t))==0}
   end
 
+  def even_split
+    self.class.all.select{|t| self.points_from_record(self.record_against(t))==2 || self.record_against(t))==4}
+  end
+
 
 
 
