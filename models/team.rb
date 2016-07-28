@@ -607,7 +607,20 @@ class Team
   end
 
   def even_split
-    self.class.all.select{|t| self.points_from_record(self.record_against(t))==2 || self.record_against(t))==4}
+    self.class.all.select{|t| self.points_from_record(self.record_against(t))==2 || self.points_from_record(self.record_against(t))==4}
+  end
+
+  def corner_kicks
+    arr = self.games.map{|a| a.corners[self.name]}
+    arr.inject(0, :+)
+  end
+
+  def self.corner_table
+    hash = {}
+    self.all.each do |team|
+      hash[team.name] = (team.corner_kicks.to_f/team.games.length.to_f).round(2)
+    end
+    self.table_sorter(hash)
   end
 
 
