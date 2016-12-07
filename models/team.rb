@@ -591,6 +591,9 @@ class Team
     self.games.select{|g| g.teams.include?(team.name)}
   end
 
+  def scores_against(team)
+  end
+
   def record_against(string)
     {"wins" => self.games_won.select{|g| self.games_against(team).include?(g)}.count, 
       "draws" =>self.games_drawn.select{|g| self.games_against(team).include?(g)}.count,

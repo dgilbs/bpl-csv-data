@@ -66,6 +66,10 @@ class Referee
     self.games_with_team(team).count
   end
 
+  def most_common_team
+    
+  end
+
   def fouls_called_on_team(team)
     count = 0
     arr = self.games.select{|g| g.teams.include?(team)}
