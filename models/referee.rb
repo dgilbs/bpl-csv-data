@@ -67,7 +67,8 @@ class Referee
   end
 
   def most_common_team
-    
+    arr = self.games.map{|g| g.teams}
+    arr.flatten.uniq
   end
 
   def fouls_called_on_team(team)
