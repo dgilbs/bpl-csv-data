@@ -626,6 +626,16 @@ class Team
     self.table_sorter(hash)
   end
 
+  def first_half_of_season
+    self.games.all[0..18]
+  end
+
+  def second_half_of_season
+    arr = self.games.all 
+    len = arr.length
+    arr[19..len]
+  end
+
 
 
 
