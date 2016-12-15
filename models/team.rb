@@ -627,14 +627,33 @@ class Team
   end
 
   def first_half_of_season
-    self.games.all[0..18]
+    self.games[0..18]
   end
 
   def second_half_of_season
-    arr = self.games.all 
+    arr = self.games 
     len = arr.length
     arr[19..len]
   end
+
+  def sot_first_half
+    arr = self.first_half_of_season.map{|g| g.sot_count[self.name]}
+    arr.inject(0, :+)
+  end
+
+  def sot_second_half
+    arr = self.second_half_of_season.map{|g| g.sot_count[self.name]}
+    arr.inject(0, :+)
+  end
+
+  def sot_breakdown
+    hash = {}
+    hash["first_half"] = self.sot_first_half
+    hash["second_half"] = self.sot_second_half
+    hash
+  end
+
+  
 
 
 
